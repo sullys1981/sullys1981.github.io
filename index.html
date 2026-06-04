@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jason W. Sullivan — AI Automation Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#FCFBF8;
+    --paper-2:#F5F2EA;
+    --paper-3:#EFEBE0;
+    --ink:#1A1613;
+    --ink-soft:#5E574C;
+    --ink-faint:#928A7C;
+    --line:#E5DFD2;
+    --line-2:#D8D1C0;
+    --accent:#D9521C;
+    --accent-deep:#B23F12;
+    --accent-soft:#FBEFE6;
+    --green:#3C7A4E;
+    --font-display:"Instrument Serif",Georgia,serif;
+    --font-sans:"Schibsted Grotesk",-apple-system,Segoe UI,sans-serif;
+    --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:80px}
+  body{
+    font-family:var(--font-sans);
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--accent);color:#fff}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px}
+  .mono{font-family:var(--font-mono)}
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:500;
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--accent)}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:color-mix(in srgb, var(--paper) 86%, transparent);
+    backdrop-filter:saturate(1.2) blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:600;letter-spacing:-.01em}
+  .monogram{
+    width:30px;height:30px;border-radius:7px;
+    background:var(--ink);color:var(--paper);
+    display:grid;place-items:center;
+    font-family:var(--font-mono);font-size:14px;font-weight:600;
+  }
+  .nav{display:flex;align-items:center;gap:28px}
+  .nav a{font-size:14.5px;color:var(--ink-soft);transition:color .15s ease;position:relative}
+  .nav a:hover{color:var(--ink)}
+  .nav .nav-links a::after{content:"";position:absolute;left:0;right:100%;bottom:-6px;height:2px;background:var(--accent);transition:right .2s ease}
+  .nav .nav-links a:hover::after{right:0}
+  .nav .nav-links a.active{color:var(--ink);font-weight:600}
+  .nav .nav-links a.active::after{right:0}
+  .status{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);position:relative}
+  .dot::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--green);opacity:.5;animation:pulse 2.4s ease-out infinite}
+  @keyframes pulse{0%{transform:scale(.7);opacity:.6}100%{transform:scale(1.9);opacity:0}}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:14.5px;font-weight:600;
+    padding:10px 18px;border-radius:9px;
+    transition:transform .12s ease, background .15s ease, box-shadow .15s ease, color .15s ease;
+    cursor:pointer;border:1px solid transparent;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:var(--ink);color:var(--paper)}
+  .btn.primary:hover{background:var(--accent-deep)}
+  .btn.accent{background:var(--accent);color:#fff;box-shadow:0 1px 0 var(--accent-deep)}
+  .btn.accent:hover{background:var(--accent-deep)}
+  .btn.ghost{border-color:var(--line-2);color:var(--ink)}
+  .btn.ghost:hover{background:var(--paper-2);border-color:var(--ink-faint)}
+  .btn .arr{transition:transform .15s ease}
+  .btn:hover .arr{transform:translateX(3px)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:76px 0 56px;border-bottom:1px solid var(--line)}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+  h1{
+    font-family:var(--font-display);
+    font-weight:400;
+    font-size:clamp(40px,5.6vw,66px);
+    line-height:1.08;
+    letter-spacing:-.01em;
+    margin:24px 0 38px;
+    padding-bottom:.06em;
+  }
+  h1 em{font-style:italic;color:var(--accent)}
+  .lead{font-size:19px;color:var(--ink-soft);max-width:30em}
+  .hero-cta{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .hero-note{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-faint);margin-top:18px;display:flex;align-items:center;gap:8px}
+
+  /* chat preview card */
+  .chat{
+    background:#fff;
+    border:1px solid var(--line-2);
+    border-radius:14px;
+    box-shadow:0 1px 0 var(--line),0 18px 40px -28px rgba(40,30,15,.5);
+    overflow:hidden;
+  }
+  .chat-top{
+    display:flex;align-items:center;gap:10px;
+    padding:13px 16px;border-bottom:1px solid var(--line);
+    background:var(--paper-2);
+  }
+  .chat-top .avatar{
+    width:26px;height:26px;border-radius:7px;background:var(--ink);color:var(--paper);
+    display:grid;place-items:center;font-family:var(--font-mono);font-size:12px;font-weight:600;
+  }
+  .chat-top .who{font-size:13.5px;font-weight:600;line-height:1.2}
+  .chat-top .src{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint)}
+  .chat-top .live{margin-left:auto;font-family:var(--font-mono);font-size:10.5px;color:var(--green);display:flex;align-items:center;gap:6px}
+  .chat-body{padding:18px 16px;display:flex;flex-direction:column;gap:12px;min-height:236px}
+  .bubble{
+    max-width:84%;padding:10px 13px;border-radius:13px;font-size:14px;line-height:1.5;
+    opacity:0;transform:translateY(6px);animation:rise .4s ease forwards;
+  }
+  .bubble.user{align-self:flex-end;background:var(--ink);color:var(--paper);border-bottom-right-radius:4px}
+  .bubble.bot{align-self:flex-start;background:var(--paper-2);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .bubble .cite{display:block;margin-top:7px;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint)}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .typing{display:inline-flex;gap:4px;align-self:flex-start;padding:12px 14px;background:var(--paper-2);border:1px solid var(--line);border-radius:13px;border-bottom-left-radius:4px}
+  .typing span{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);animation:blink 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}
+  .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+  /* ---------- proof strip ---------- */
+  .proof{border-bottom:1px solid var(--line);background:var(--paper)}
+  .proof .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  .stat{padding:34px 28px 34px 0;border-right:1px solid var(--line)}
+  .stat:last-child{border-right:none;padding-right:0}
+  .stat:nth-child(2){padding-left:28px}
+  .stat:nth-child(3){padding-left:28px}
+  .stat .num{font-family:var(--font-display);font-size:46px;line-height:1;letter-spacing:-.01em}
+  .stat .num b{color:var(--accent);font-weight:400}
+  .stat .lbl{margin-top:10px;color:var(--ink-soft);font-size:14.5px;max-width:22em}
+
+  /* ---------- section scaffold ---------- */
+  section.block{padding:72px 0;border-bottom:1px solid var(--line);scroll-margin-top:80px}
+  header.hero{scroll-margin-top:80px}
+  .sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:38px}
+  h2{font-family:var(--font-display);font-weight:400;font-size:clamp(30px,4vw,42px);line-height:1.05;letter-spacing:-.01em}
+  .sec-head p{color:var(--ink-soft);font-size:15.5px;max-width:24em}
+
+  /* services */
+  .services{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{
+    background:#fff;border:1px solid var(--line);border-radius:13px;padding:26px;
+    display:flex;flex-direction:column;
+    transition:border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+  }
+  .card:hover{border-color:var(--line-2);transform:translateY(-3px);box-shadow:0 18px 36px -30px rgba(40,30,15,.55)}
+  .card .idx{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);margin-bottom:16px}
+  .card h3{font-size:21px;font-weight:600;letter-spacing:-.01em;margin-bottom:9px}
+  .card p{color:var(--ink-soft);font-size:15px}
+  .card .foot{margin-top:auto;padding-top:20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .price{font-family:var(--font-mono);font-size:13.5px;font-weight:500;color:var(--ink);background:var(--accent-soft);border:1px solid #F1DDCC;padding:5px 11px;border-radius:7px;white-space:nowrap}
+
+  /* featured */
+  .feature{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line-2);border-radius:16px;overflow:hidden;background:#fff}
+  .feature-info{padding:40px;display:flex;flex-direction:column}
+  .feature-info .tag-eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:18px}
+  .feature-info h3{font-family:var(--font-display);font-weight:400;font-size:34px;line-height:1.05;margin-bottom:14px}
+  .feature-info p{color:var(--ink-soft);font-size:15.5px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .tag{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);background:var(--paper-2);border:1px solid var(--line);padding:5px 10px;border-radius:6px}
+  .feature-info .links{margin-top:auto;padding-top:26px;display:flex;gap:18px;flex-wrap:wrap}
+  .link-arr{font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:7px;color:var(--ink);border-bottom:2px solid var(--accent);padding-bottom:2px;transition:gap .15s ease}
+  .link-arr:hover{gap:11px}
+  .feature-visual{background:var(--paper-2);border-left:1px solid var(--line);padding:34px;display:grid;place-items:center}
+
+  /* how i work */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  .step{padding:0 30px;border-right:1px solid var(--line)}
+  .step:first-child{padding-left:0}
+  .step:last-child{border-right:none;padding-right:0}
+  .step .n{font-family:var(--font-mono);font-size:13px;color:var(--accent);font-weight:500;margin-bottom:14px}
+  .step h4{font-size:19px;font-weight:600;margin-bottom:8px;letter-spacing:-.01em}
+  .step p{color:var(--ink-soft);font-size:14.5px}
+
+  /* about */
+  .about-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:48px;align-items:start}
+  .about-grid .body p{font-size:17px;color:var(--ink-soft);margin-bottom:16px}
+  .about-grid .body p strong{color:var(--ink);font-weight:600}
+  .stack-title{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+  .stack{display:flex;flex-wrap:wrap;gap:8px}
+
+  /* cta band */
+  .cta-band{background:var(--ink);color:var(--paper);border:none}
+  .cta-band .wrap{padding:74px 32px;text-align:center}
+  .cta-band h2{color:var(--paper)}
+  .cta-band p{color:#C9C2B5;font-size:17px;max-width:30em;margin:14px auto 30px}
+  .cta-band .eyebrow{color:#F0A77E}
+  .cta-band .eyebrow::before{background:#F0A77E}
+  .cta-band .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+  footer{padding:40px 0;background:var(--paper)}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  footer .mono{font-size:13px;color:var(--ink-faint)}
+  footer .flinks{display:flex;gap:20px}
+  footer .flinks a{font-size:14px;color:var(--ink-soft);transition:color .15s}
+  footer .flinks a:hover{color:var(--accent)}
+
+  @media(max-width:860px){
+    .hero-grid{grid-template-columns:1fr;gap:40px}
+    .feature{grid-template-columns:1fr}
+    .feature-visual{border-left:none;border-top:1px solid var(--line)}
+    .about-grid{grid-template-columns:1fr;gap:32px}
+  }
+  @media(max-width:680px){
+    .wrap{padding:0 22px}
+    .nav .nav-links{display:none}
+    .services{grid-template-columns:1fr}
+    .proof .wrap{grid-template-columns:1fr}
+    .stat{border-right:none;border-bottom:1px solid var(--line);padding:24px 0!important}
+    .stat:last-child{border-bottom:none}
+    .steps{grid-template-columns:1fr;gap:0}
+    .step{padding:24px 0;border-right:none;border-bottom:1px solid var(--line)}
+    .step:last-child{border-bottom:none}
+    .hero{padding:48px 0 40px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <span class="monogram">JS</span>
+      <span>Jason W. Sullivan</span>
+    </a>
+    <nav class="nav">
+      <div class="nav-links" style="display:flex;gap:28px">
+        <a href="#services">Services</a>
+        <a href="#work">Work</a>
+        <a href="#process">Process</a>
+        <a href="#about">About</a>
+      </div>
+      <a class="btn accent" href="mailto:sullys1981@gmail.com">Hire me <span class="arr">→</span></a>
+    </nav>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">AI Automation Developer</span>
+      <h1>I build AI assistants &amp; automations that quietly save businesses <em>5&ndash;10 hours a week.</em></h1>
+      <p class="lead">Chatbots, workflow automation, and custom GPT/Claude tools &mdash;
+         delivered as working systems with documentation. Not science projects.</p>
+      <div class="hero-cta">
+        <a class="btn accent" href="mailto:sullys1981@gmail.com">Start a project <span class="arr">→</span></a>
+        <a class="btn ghost" href="#work">See it working</a>
+      </div>
+      <div class="hero-note"><span class="dot"></span> Available for new work &middot; replies within a day</div>
+    </div>
+
+    <!-- live chat preview -->
+    <div class="chat" id="chat">
+      <div class="chat-top">
+        <div class="avatar">AI</div>
+        <div>
+          <div class="who">Support Assistant</div>
+          <div class="src">trained on acme-store.com/help</div>
+        </div>
+        <div class="live"><span class="dot" style="background:var(--green)"></span>live demo</div>
+      </div>
+      <div class="chat-body" id="chatBody"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ PROOF ============ -->
+<div class="proof">
+  <div class="wrap">
+    <div class="stat">
+      <div class="num"><b>~10</b> min</div>
+      <div class="lbl">to retarget a chatbot to a new business&rsquo;s knowledge base.</div>
+    </div>
+    <div class="stat">
+      <div class="num"><b>80%</b></div>
+      <div class="lbl">of repetitive support questions handled without a human.</div>
+    </div>
+    <div class="stat">
+      <div class="num"><b>24/7</b></div>
+      <div class="lbl">answers for customers &mdash; with a clean handoff when it&rsquo;s unsure.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SERVICES ============ -->
+<section class="block" id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow">What I build</span>
+        <h2 style="margin-top:18px">Clear scope.<br />Fixed prices. Fast.</h2>
+      </div>
+      <p>Every engagement ships as a working system with a short Loom walkthrough and docs &mdash; so your team can actually run it.</p>
+    </div>
+    <div class="services">
+      <div class="card">
+        <div class="idx">01 / chatbot</div>
+        <h3>AI Support Chatbot</h3>
+        <p>Trained on your FAQs &amp; docs, deployed to your website or WhatsApp. Cuts repetitive tickets and answers customers around the clock &mdash; only from your own content.</p>
+        <div class="foot"><span class="price">from $400 &middot; +$150/mo</span></div>
+      </div>
+      <div class="card">
+        <div class="idx">02 / automation</div>
+        <h3>Workflow Automation</h3>
+        <p>Connect your tools (CRM, email, Sheets, Slack) with AI in the loop &mdash; capture, summarize, and route leads automatically while you sleep.</p>
+        <div class="foot"><span class="price">from $300 / flow</span></div>
+      </div>
+      <div class="card">
+        <div class="idx">03 / custom</div>
+        <h3>Custom AI Tool or Script</h3>
+        <p>Bespoke builds: data scraping &amp; enrichment, auto-generated reports, internal GPT/Claude tools for your team. If it&rsquo;s repetitive, it can be automated.</p>
+        <div class="foot"><span class="price">$50&ndash;80/hr or fixed</span></div>
+      </div>
+      <div class="card">
+        <div class="idx">04 / advisory</div>
+        <h3>AI Integration &amp; Consulting</h3>
+        <p>Not sure where AI fits? I audit your workflow and ship the one automation with the biggest time/ROI payoff first &mdash; no jargon, no fluff.</p>
+        <div class="foot"><span class="price">free 20-min scoping call</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURED WORK ============ -->
+<section class="block" id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow">Featured work</span>
+        <h2 style="margin-top:18px">A demo you can run yourself.</h2>
+      </div>
+      <p>No screenshots-as-proof. Clone the repo, add a key, and watch it answer from a real knowledge base.</p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-info">
+        <div class="tag-eyebrow">Retrieval-Augmented &middot; Open source</div>
+        <h3>AI Customer-Support Chatbot</h3>
+        <p>A retrieval-augmented assistant that answers <strong>only</strong> from a company&rsquo;s knowledge base and cites its sources &mdash; so it never invents policy. Retargetable to any business in about ten minutes.</p>
+        <div class="tags">
+          <span class="tag">Python</span>
+          <span class="tag">RAG</span>
+          <span class="tag">Claude / OpenAI</span>
+          <span class="tag">Streamlit</span>
+        </div>
+        <div class="links">
+          <a class="link-arr" href="https://github.com/Sullys1981/ai-support-chatbot">Code &amp; live demo &rarr;</a>
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="chat" style="width:100%;max-width:360px;box-shadow:0 1px 0 var(--line),0 22px 44px -30px rgba(40,30,15,.55)">
+          <div class="chat-top">
+            <div class="avatar">AI</div>
+            <div>
+              <div class="who">Acme Store Helper</div>
+              <div class="src">knowledge_base/ &middot; 14 docs</div>
+            </div>
+          </div>
+          <div class="chat-body" style="min-height:200px">
+            <div class="bubble user" style="animation-delay:.1s">Do you ship to Canada?</div>
+            <div class="bubble bot" style="animation-delay:.5s">Yes &mdash; standard shipping to Canada is 5&ndash;8 business days, calculated at checkout.<span class="cite">source: shipping-policy.md</span></div>
+            <div class="bubble user" style="animation-delay:1s">What&rsquo;s your return window?</div>
+            <div class="bubble bot" style="animation-delay:1.4s">30 days from delivery for unused items. I can start a return if you share your order number.<span class="cite">source: returns.md</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section class="block" id="process">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow">How I work</span>
+        <h2 style="margin-top:18px">Three steps. No surprises.</h2>
+      </div>
+      <p>Most projects go from first call to shipped in a week or two.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">Step 01</div>
+        <h4>Scope</h4>
+        <p>A free 20-minute call to find the one repetitive task worth automating first. You get a fixed price and a clear deliverable &mdash; before any money changes hands.</p>
+      </div>
+      <div class="step">
+        <div class="n">Step 02</div>
+        <h4>Build</h4>
+        <p>I build it with error handling and your real data, sending short progress updates. You see a working version early, not a big reveal at the end.</p>
+      </div>
+      <div class="step">
+        <div class="n">Step 03</div>
+        <h4>Handoff</h4>
+        <p>You get the system, documentation, and a Loom showing how to run it. Optional monthly retainer keeps it maintained and improving.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="block" id="about">
+  <div class="wrap about-grid">
+    <div class="body">
+      <span class="eyebrow">About</span>
+      <h2 style="margin:18px 0 24px">A developer who ships outcomes, not demos.</h2>
+      <p>I turn repetitive, manual work into reliable systems. I care about the things that actually matter to a business: <strong>hours saved, money not left on the table,</strong> and clear communication along the way.</p>
+      <p>No buzzwords, no months-long roadmaps. I find the highest-leverage automation, build it fast, document it, and hand you something your team can run without me.</p>
+    </div>
+    <div class="stack-block">
+      <div class="stack-title">Stack &amp; tools</div>
+      <div class="stack">
+        <span class="tag">Python</span>
+        <span class="tag">Anthropic / OpenAI APIs</span>
+        <span class="tag">RAG</span>
+        <span class="tag">Make</span>
+        <span class="tag">Zapier</span>
+        <span class="tag">n8n</span>
+        <span class="tag">Web scraping</span>
+        <span class="tag">Cron / workflows</span>
+        <span class="tag">APIs &amp; integrations</span>
+        <span class="tag">Streamlit</span>
+      </div>
+      <div class="stack-title" style="margin-top:28px">Good fit for</div>
+      <div class="stack">
+        <span class="tag">Agencies</span>
+        <span class="tag">E-commerce</span>
+        <span class="tag">Real estate</span>
+        <span class="tag">Clinics</span>
+        <span class="tag">SaaS teams</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="block cta-band">
+  <div class="wrap">
+    <span class="eyebrow">Let&rsquo;s talk</span>
+    <h2 style="margin-top:18px">Have a task that eats your week?</h2>
+    <p>Tell me the one thing your team does over and over. I&rsquo;ll tell you if AI can take it off your plate &mdash; free, in 20 minutes.</p>
+    <div class="row">
+      <a class="btn accent" href="mailto:sullys1981@gmail.com">Book a scoping call <span class="arr">→</span></a>
+      <a class="btn ghost" href="https://contra.com/jason_sullivan_g3ni25s8" style="border-color:#3A352D;color:var(--paper)">View profile</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="mono">Jason W. Sullivan &mdash; AI Automation Developer</div>
+    <div class="flinks">
+      <a href="mailto:sullys1981@gmail.com">Email</a>
+      <a href="https://github.com/Sullys1981">GitHub</a>
+      <a href="https://contra.com/jason_sullivan_g3ni25s8">Contra</a>
+    </div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Animated hero chat — types out a short, believable exchange, then loops.
+  (function(){
+    var body = document.getElementById('chatBody');
+    if(!body) return;
+    var script = [
+      {who:'user', text:'How long does shipping take?'},
+      {who:'bot',  text:'Standard shipping is 3&ndash;5 business days within the US. Express (1&ndash;2 days) is available at checkout.', cite:'source: shipping-policy.md'},
+      {who:'user', text:'Can I change my address after ordering?'},
+      {who:'bot',  text:'Yes, if the order hasn&rsquo;t shipped. Share your order number and I&rsquo;ll flag it for the team.', cite:'source: orders-faq.md'}
+    ];
+    var i = 0;
+    function clear(){ body.innerHTML=''; }
+    function addTyping(){
+      var t = document.createElement('div');
+      t.className='typing';
+      t.innerHTML='<span></span><span></span><span></span>';
+      body.appendChild(t);
+      return t;
+    }
+    function addBubble(msg){
+      var b = document.createElement('div');
+      b.className='bubble '+msg.who;
+      b.innerHTML = msg.text + (msg.cite ? '<span class="cite">'+msg.cite+'</span>' : '');
+      body.appendChild(b);
+    }
+    function step(){
+      var msg = script[i];
+      if(msg.who==='bot'){
+        var t = addTyping();
+        setTimeout(function(){ t.remove(); addBubble(msg); next(); }, 750);
+      } else {
+        addBubble(msg);
+        next();
+      }
+    }
+    function next(){
+      i++;
+      if(i < script.length){
+        setTimeout(step, msg_delay());
+      } else {
+        setTimeout(function(){ clear(); i=0; step(); }, 3600);
+      }
+    }
+    function msg_delay(){ return script[i] && script[i].who==='user' ? 900 : 500; }
+    step();
+  })();
+
+  // In-page nav: smooth scroll with sticky-header offset + active-tab highlighting.
+  (function(){
+    var HEADER = 80;
+    var links = Array.prototype.slice.call(document.querySelectorAll('a[href^="#"]'));
+    function targetFor(hash){
+      if(!hash || hash === '#') return null;
+      try { return document.querySelector(hash); } catch(e){ return null; }
+    }
+    links.forEach(function(a){
+      a.addEventListener('click', function(e){
+        var el = targetFor(a.getAttribute('href'));
+        if(!el) return;                       // let it behave natively if no match
+        e.preventDefault();
+        var y = el.getBoundingClientRect().top + window.pageYOffset - HEADER;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        history.replaceState(null, '', a.getAttribute('href'));
+      });
+    });
+
+    // Active-tab tracking as you scroll.
+    var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
+    var sections = navLinks
+      .map(function(a){ return targetFor(a.getAttribute('href')); })
+      .filter(Boolean);
+    function setActive(id){
+      navLinks.forEach(function(a){
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+      });
+    }
+    if('IntersectionObserver' in window && sections.length){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(en.isIntersecting) setActive(en.target.id);
+        });
+      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+      sections.forEach(function(s){ io.observe(s); });
+    }
+  })();
+</script>
+</body>
+</html>
