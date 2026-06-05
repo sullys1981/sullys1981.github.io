@@ -1,0 +1,159 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>AI Assistant - Live Demo by Jason W. Sullivan</title>
+<style>
+ :root{--ink:#1a2230;--soft:#6b7280;--line:#e7e2d6;--accent:#16a34a;--paper:#f4efe6;--dark:#11151c}
+ *{box-sizing:border-box;margin:0;padding:0}
+ html,body{height:100%}
+ body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#0e1117;color:var(--ink);height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+ .top{background:var(--dark);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:10px;flex:none}
+ .brandmark{width:30px;height:30px;border-radius:8px;background:#222b36;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ .brandtxt{line-height:1.15}
+ .brandtxt b{font-size:14px;font-weight:800}.brandtxt span{display:block;font-size:11px;color:#9aa6b2}
+ .live{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;color:#cfe9d6}
+ .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.8s infinite}
+ @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.6)}70%{box-shadow:0 0 0 7px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+ #avband{position:relative;height:34vh;height:34dvh;min-height:150px;max-height:280px;background:#0e1726;flex:none}
+ #avband canvas{width:100%;height:100%;display:block}
+ #avstart{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,14,24,.55);cursor:pointer}
+ .startbtn{background:var(--accent);color:#fff;padding:13px 26px;border-radius:11px;font-weight:700;font-size:16px;box-shadow:0 10px 30px -10px rgba(0,0,0,.6)}
+ .stage{flex:1;min-height:0;background:var(--paper);overflow-y:auto}
+ .slide{padding:22px 26px}
+ .slide h2{color:var(--ink);font-size:24px;letter-spacing:-.4px;margin-bottom:14px}
+ .slide ul{list-style:none}
+ .slide li{font-size:17.5px;line-height:1.5;padding:8px 0 8px 28px;position:relative;color:var(--ink);opacity:0;animation:fin .45s forwards}
+ .slide li:before{content:'';position:absolute;left:3px;top:15px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+ @keyframes fin{to{opacity:1}}
+ #ans{margin:0 26px 16px;padding:13px 16px;border-left:4px solid var(--accent);background:#fff;border-radius:10px;box-shadow:0 8px 24px -16px rgba(0,0,0,.6);display:none}
+ #ans .q{font-size:13px;color:var(--soft);font-weight:600;margin-bottom:4px}
+ #ans .a{font-size:16px;line-height:1.5}
+ #ans .src{display:none;margin-top:9px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#3b7a4e;background:#eaf5ee;padding:3px 8px;border-radius:6px}
+ .ctl{flex:none;display:flex;align-items:center;gap:9px;padding:10px 16px;background:#fff;border-top:1px solid var(--line)}
+ .ctl button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:9px 13px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+ .ctl button:disabled{opacity:.4;cursor:default}
+ .ctl .cta{background:var(--ink);color:#fff;border-color:var(--ink)}
+ .ctl .nx{background:var(--accent);color:#fff;border-color:var(--accent);margin-left:auto}
+ .ctl .count{color:var(--soft);font-size:13px}
+ .askbar{flex:none;display:flex;gap:8px;padding:11px 16px;background:#efeadf;border-top:1px solid var(--line)}
+ .askbar input{flex:1;border:1px solid var(--line);border-radius:11px;padding:12px 14px;font:inherit;font-size:15px;background:#fff}
+ .askbar input:focus{outline:none;border-color:var(--accent)}
+ .askbar button{border:none;background:var(--accent);color:#fff;border-radius:11px;width:54px;font-size:18px;cursor:pointer}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head><body>
+ <div class="top">
+   <div class="brandmark">JS</div>
+   <div class="brandtxt"><b>AI Assistant</b><span>by Jason W. Sullivan</span></div>
+   <div class="live"><span class="dot"></span>LIVE DEMO</div>
+ </div>
+ <div id="avband"><canvas id="c"></canvas><div id="avstart"><div class="startbtn">&#9654;&nbsp; Tap to meet your assistant</div></div></div>
+ <div class="stage"><div class="slide"><h2 id="stitle">Meet your AI assistant</h2><ul id="spoints"></ul></div></div>
+ <div id="ans"><div class="q" id="ansq"></div><div class="a" id="ansa"></div><span class="src" id="anssrc"></span></div>
+ <div class="ctl"><button id="prev">&larr; Back</button><button id="replay">&#8635; Replay</button><button id="cta" class="cta">Work with Jason</button><span class="count" id="count"></span><button id="next" class="nx">Next &rarr;</button></div>
+ <div class="askbar"><input id="q" placeholder="Ask what I could do for your business..."><button id="ask">&rarr;</button></div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+var canvas=document.getElementById('c');
+var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;
+var scene=new THREE.Scene();scene.background=new THREE.Color(0x0e1726);
+var camera=new THREE.PerspectiveCamera(30,1.6,0.1,100);
+function rsize(){var w=canvas.clientWidth||1,h=canvas.clientHeight||1;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+window.addEventListener('resize',rsize);
+scene.add(new THREE.HemisphereLight(0xffffff,0x55606e,1.7));
+var key=new THREE.DirectionalLight(0xffffff,0.75);key.position.set(0,1.3,3);scene.add(key);
+var fl=new THREE.DirectionalLight(0xffffff,0.45);fl.position.set(-1.6,0.6,1.6);scene.add(fl);
+var fr=new THREE.DirectionalLight(0xffffff,0.45);fr.position.set(1.6,0.6,1.6);scene.add(fr);
+var morphMeshes=[],headBone=null,mixer=null,eyeL=null,eyeR=null,eyeLQ=null,eyeRQ=null,clock=new THREE.Clock();
+function setMorph(n,v){for(var i=0;i<morphMeshes.length;i++){var m=morphMeshes[i],idx=m.morphTargetDictionary[n];if(idx!==undefined)m.morphTargetInfluences[idx]=v;}}
+new GLTFLoader().load('./avatar.glb',function(g){var root=g.scene;
+ root.traverse(function(o){if(o.isMesh&&o.morphTargetDictionary)morphMeshes.push(o);if(o.isBone&&/head/i.test(o.name)&&!headBone)headBone=o;if(o.isBone&&o.name==='LeftEye'){eyeL=o;eyeLQ=o.quaternion.clone();}if(o.isBone&&o.name==='RightEye'){eyeR=o;eyeRQ=o.quaternion.clone();}});
+ var box=new THREE.Box3().setFromObject(root);var sz=new THREE.Vector3();box.getSize(sz);root.position.y=-box.min.y;box.setFromObject(root);var top=box.max.y;var fy=top-Math.min(0.25,sz.y*0.16);scene.add(root);
+ if(g.animations&&g.animations.length){mixer=new THREE.AnimationMixer(root);mixer.clipAction(g.animations[0]).play();root.rotation.y=0.55;}
+ camera.position.set(0,fy,1.05);camera.lookAt(0,fy,0);rsize();},undefined,function(){});
+var mouth=0,mouthTarget=0,lastM=0,blinkT=-1,nextBlink=2+Math.random()*3,curU=null;
+var pickedVoice=null;
+function pickVoice(){if(!('speechSynthesis'in window))return;var vs=speechSynthesis.getVoices()||[];if(!vs.length)return;var pref=['Microsoft David','Google US English','Microsoft Mark','Microsoft Guy','Daniel','Alex','en-US','en_US','en-GB'];for(var p=0;p<pref.length;p++){for(var k=0;k<vs.length;k++){if((vs[k].name+' '+vs[k].lang).indexOf(pref[p])>=0){pickedVoice=vs[k];return;}}}for(var k2=0;k2<vs.length;k2++){if(vs[k2].lang&&vs[k2].lang.toLowerCase().indexOf('en')===0){pickedVoice=vs[k2];return;}}}
+if('speechSynthesis'in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+var audioCtx=null,analyser=null,aData=null,audioPlaying=false,curSrc=null,speechSeq=0;
+function ensureCtx(){if(!audioCtx){var AC=window.AudioContext||window.webkitAudioContext;audioCtx=new AC();analyser=audioCtx.createAnalyser();analyser.fftSize=256;aData=new Uint8Array(analyser.fftSize);analyser.connect(audioCtx.destination);}}
+function speakBrowser(text){var t=String(text||'');var i=t.indexOf('[source:');if(i>=0)t=t.slice(0,i);t=t.trim();if(!t)return;if(!('speechSynthesis'in window))return;try{speechSynthesis.cancel();}catch(e){}var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=1.0;u.pitch=1.0;if(pickedVoice)u.voice=pickedVoice;curU=u;try{speechSynthesis.speak(u);}catch(e){}}
+function playClip(clipKey,fallbackText){ensureCtx();if(audioCtx.state==='suspended'){try{audioCtx.resume();}catch(e){}}if(curSrc){try{curSrc.stop();}catch(e){}curSrc=null;}audioPlaying=false;try{if('speechSynthesis'in window)speechSynthesis.cancel();}catch(e){}var myseq=++speechSeq;
+ fetch('audio/'+clipKey+'.wav').then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();}).then(function(b){return audioCtx.decodeAudioData(b);}).then(function(ab){if(myseq!==speechSeq)return;var s=audioCtx.createBufferSource();s.buffer=ab;s.connect(analyser);s.onended=function(){if(curSrc===s){audioPlaying=false;curSrc=null;}};curSrc=s;audioPlaying=true;s.start();}).catch(function(){if(myseq===speechSeq){audioPlaying=false;speakBrowser(fallbackText||'');}});}
+function animate(){requestAnimationFrame(animate);var dt=clock.getDelta();if(mixer)mixer.update(dt);
+ if(eyeL&&eyeLQ)eyeL.quaternion.copy(eyeLQ);if(eyeR&&eyeRQ)eyeR.quaternion.copy(eyeRQ);
+ var browserSpk=('speechSynthesis'in window)&&speechSynthesis.speaking;var spk=audioPlaying||browserSpk;
+ if(morphMeshes.length){
+  if(audioPlaying&&analyser){analyser.getByteTimeDomainData(aData);var s2=0;for(var ai=0;ai<aData.length;ai++){var dv=(aData[ai]-128)/128;s2+=dv*dv;}mouthTarget=Math.min(1,Math.sqrt(s2/aData.length)*4.2);}
+  else if(browserSpk){if(performance.now()-lastM>85){mouthTarget=0.18+Math.random()*0.5;lastM=performance.now();}}else{mouthTarget=0;}
+  mouth+=(mouthTarget-mouth)*Math.min(1,dt*24);
+  setMorph('jawOpen',mouth*0.62);setMorph('mouthOpen',mouth*0.35);setMorph('viseme_aa',spk?mouth*0.45:0);
+  nextBlink-=dt;if(blinkT<0&&nextBlink<=0){blinkT=0;nextBlink=2.6+Math.random()*3.4;}
+  var bl=0;if(blinkT>=0){blinkT+=dt;bl=blinkT<0.07?blinkT/0.07:(blinkT<0.16?1-(blinkT-0.07)/0.09:0);if(blinkT>0.16)blinkT=-1;}
+  setMorph('eyeBlinkLeft',bl);setMorph('eyeBlinkRight',bl);setMorph('eyeSquintLeft',0);setMorph('eyeSquintRight',0);setMorph('eyesClosed',0);setMorph('eyeLookInLeft',0);setMorph('eyeLookOutLeft',0);setMorph('eyeLookInRight',0);setMorph('eyeLookOutRight',0);setMorph('eyeLookUpLeft',0);setMorph('eyeLookDownLeft',0);setMorph('eyeLookUpRight',0);setMorph('eyeLookDownRight',0);
+ }
+ renderer.render(scene,camera);}
+animate();
+window.coxPlay=playClip;window.coxEnableAudio=function(){ensureCtx();if(audioCtx&&audioCtx.state==='suspended'){try{audioCtx.resume();}catch(e){}}};
+</script>
+<script>
+ var SLIDES=[
+  {t:"Meet your AI assistant",k:"s0",p:["A friendly, always-on assistant for your business","Built by Jason W. Sullivan","Answers from your content - and cites every source"],say:"Hi. I'm a talking A I assistant, built by Jason Sullivan. Give me two minutes and I'll show you what I could do for your business. Everything you're seeing runs right here in your browser."},
+  {t:"What I do for you",k:"s1",p:["Answer the questions your customers and staff ask all day","From your own approved documents and FAQs","On your website, phone line, or a lobby kiosk - around the clock"],say:"I answer the routine questions your customers and your team ask all day long, using your own approved documents. I can live on your website, answer your phone, or stand on a kiosk in your lobby, twenty four seven."},
+  {t:"How I work",k:"s2",p:["I answer only from content you approve","I cite a source on every answer","When I'm not sure, I hand off to a person","No guessing, no made-up answers"],say:"Here's how I work. I answer only from the content you approve, and I cite my source every time. When I don't have a grounded answer, I hand you to a real person instead of making something up."},
+  {t:"Safe by design",k:"s3",p:["I store no private data","I don't send your information to a cloud AI service","Every answer traces back to a source you control","You decide exactly what I know"],say:"I'm built to be safe. I store no private data, I don't ship your information off to some cloud A I service, and every answer traces back to a source you control. You decide exactly what I know."},
+  {t:"What I could do for your company",k:"s4",p:["Deflect the repetitive questions that eat your team's day","Answer your most common FAQs instantly, every time","Help onboard new staff faster","Capture leads and questions while you sleep"],say:"So, what could I do for your company? I take the repetitive questions off your team's plate, answer your most common questions instantly and consistently, help new staff get up to speed, and capture leads even while you sleep."},
+  {t:"Easy to get started",k:"s5",p:["A small private pilot, built in days","Around twenty of your approved articles to start","You measure the results","No lock-in, no long contracts"],say:"And getting started is easy. Jason builds a small private pilot in days, on about twenty of your approved articles. You measure the results yourself, with no lock in and no long contracts."},
+  {t:"Want one for your business?",k:"s6",p:["Built by Jason W. Sullivan","sullys1981.github.io","Ask me anything right now"],say:"If you'd like one of these working for your own business, Jason can build it. Visit his site, or go ahead and ask me a question right now. I'm listening."}
+ ];
+ var STOP={the:1,a:1,an:1,is:1,are:1,was:1,were:1,to:1,of:1,in:1,on:1,at:1,it:1,its:1,i:1,me:1,my:1,we:1,our:1,us:1,you:1,your:1,this:1,that:1,these:1,those:1,and:1,or:1,but:1,for:1,with:1,as:1,be:1,been:1,im:1,id:1,so:1,if:1,about:1,would:1,could:1,will:1,have:1,has:1,had:1,am:1,does:1};
+ var KB=[
+  {kw:["do","can","help","capable","offer","useful","handle","task","tasks","work","good","use","everyday","questions","question","answer","answers"],src:"capabilities",k:"kb-capabilities",a:"I answer the routine questions your customers and staff ask all day - from your approved documents and FAQs - on your website, phone line, or a kiosk, around the clock."},
+  {kw:["safe","secure","security","privacy","private","data","gdpr","store","stored","storing","cloud","leak","protect","confidential","compliance"],src:"privacy",k:"kb-privacy",a:"I'm built to be safe: I store no private data, I answer only from content you approve, and I don't send your information to a cloud AI service. Every answer traces back to a source you control."},
+  {kw:["accurate","accuracy","wrong","hallucinate","hallucination","made","make","up","guess","trust","reliable","mistake","correct","bluff"],src:"accuracy",k:"kb-accuracy",a:"I don't guess. I answer only from your approved content and cite the source. When I don't have a grounded answer, I hand off to a person instead of making something up."},
+  {kw:["cost","price","pricing","much","expensive","budget","afford","charge","fee","rate","pay","money","quote","dollars"],src:"pricing",k:"kb-pricing",a:"Most projects start with a small fixed-price pilot, then scale from there. The exact price depends on your content and where you want me to run - the best next step is to tell Jason what you'd want me to handle."},
+  {kw:["start","started","begin","setup","set","onboard","sign","build","built","long","fast","quick","days","launch","deploy","implement","get"],src:"get-started",k:"kb-get-started",a:"Getting started is simple: you pick the questions you want me to handle and the documents I answer from, and Jason builds a private pilot in days. Reach him at sullys1981.github.io."},
+  {kw:["who","jason","sullivan","made","builder","developer","behind","creator","human","person","real"],src:"about-jason",k:"kb-about-jason",a:"I was built by Jason W. Sullivan, who builds local, governed AI assistants for businesses - transparent, auditable, and with no lock-in. You can reach him at sullys1981.github.io."},
+  {kw:["where","run","website","site","phone","kiosk","tablet","lobby","app","embed","host","hardware","integrate","platform"],src:"deployment",k:"kb-deployment",a:"I can run on your website, answer your phone line, or stand on a kiosk or tablet in your lobby. I'm light enough to run locally on modest hardware."},
+  {kw:["language","languages","spanish","french","translate","translation","bilingual","english","multilingual"],src:"languages",k:"kb-languages",a:"I can be set up to answer in more than one language, using your approved translations."},
+  {kw:["return","returns","refund","shipping","ship","delivery","warranty","hours","policy","exchange","order","product","customer"],src:"sample-support",k:"kb-sample-support",a:"In a real deployment I'd answer your specific policies - returns, shipping, hours, warranty - straight from your approved documents, and cite each one. This demo uses sample content to show how that feels."},
+  {kw:["staff","employee","employees","team","internal","desk","onboarding","training","hr","payroll","worker"],src:"staff-use",k:"kb-staff-use",a:"I'm just as useful inside your business - answering staff and help-desk questions, and helping new employees get up to speed - all from your approved internal docs."}
+ ];
+ var HANDOFF={a:"That's a great one for Jason himself. The best next step is to reach him at sullys1981.github.io, and he can tell you exactly how I'd handle that for your business.",src:null,k:"handoff"};
+ function retrieve(q){
+  var toks=(String(q).toLowerCase().match(/[a-z0-9]{2,}/g)||[]);
+  var qset={};for(var i=0;i<toks.length;i++){if(!STOP[toks[i]])qset[toks[i]]=1;}
+  var best=null,bestScore=0;
+  for(var j=0;j<KB.length;j++){var c=KB[j],s=0;for(var k=0;k<c.kw.length;k++){if(qset[c.kw[k]])s++;}if(s>bestScore){bestScore=s;best=c;}}
+  if(best&&bestScore>=1)return best;
+  return HANDOFF;
+ }
+ var idx=0,started=false;
+ var stitle=document.getElementById('stitle'),spoints=document.getElementById('spoints'),count=document.getElementById('count');
+ var prevB=document.getElementById('prev'),nextB=document.getElementById('next');
+ function show(narrate){var s=SLIDES[idx];stitle.textContent=s.t;spoints.innerHTML='';s.p.forEach(function(b,i){var li=document.createElement('li');li.textContent=b;li.style.animationDelay=(i*0.12)+'s';spoints.appendChild(li);});count.textContent=(idx+1)+' / '+SLIDES.length;document.getElementById('ans').style.display='none';prevB.disabled=(idx===0);nextB.textContent=(idx===SLIDES.length-1)?'Finish':'Next →';if(narrate&&window.coxPlay)window.coxPlay(s.k,s.say);}
+ function unlock(){if(started)return;started=true;var ov=document.getElementById('avstart');if(ov)ov.style.display='none';if(window.coxEnableAudio)window.coxEnableAudio();}
+ function begin(){unlock();idx=0;show(true);}
+ function go(n){var ni=idx+n;if(ni<0||ni>=SLIDES.length)return;idx=ni;show(true);}
+ function finish(){if(window.coxPlay)window.coxPlay('finish',"That's the tour. If you'd like one of these for your business, tap Work with Jason, or just ask me a question.");}
+ document.getElementById('avstart').addEventListener('click',begin);
+ nextB.addEventListener('click',function(){if(!started){begin();return;}if(idx>=SLIDES.length-1){finish();return;}go(1);});
+ prevB.addEventListener('click',function(){if(started)go(-1);});
+ document.getElementById('replay').addEventListener('click',function(){if(!started){begin();return;}show(true);});
+ document.getElementById('cta').addEventListener('click',function(){window.open('https://sullys1981.github.io','_blank');});
+ function ask(){var i=document.getElementById('q'),v=i.value.trim();if(!v)return;i.value='';unlock();
+  document.getElementById('ansq').textContent='Q: '+v;
+  var r=retrieve(v);
+  document.getElementById('ansa').textContent=r.a;
+  var sp=document.getElementById('anssrc');
+  if(r.src){sp.textContent='source: '+r.src;sp.style.display='inline-block';}else{sp.style.display='none';}
+  var box=document.getElementById('ans');box.style.display='block';box.scrollIntoView({block:'nearest'});
+  if(window.coxPlay)window.coxPlay(r.k,r.a);}
+ document.getElementById('ask').addEventListener('click',ask);
+ document.getElementById('q').addEventListener('keydown',function(e){if(e.key==='Enter')ask();});
+ show(false);
+</script>
+</body></html>
