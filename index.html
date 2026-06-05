@@ -150,6 +150,12 @@
   .typing span:nth-child(2){animation-delay:.2s}
   .typing span:nth-child(3){animation-delay:.4s}
   @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+  .chat-ask{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--paper-2)}
+  .chat-ask input{flex:1;border:1px solid var(--line-2);border-radius:9px;padding:9px 12px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+  .chat-ask input:focus{outline:none;border-color:var(--accent)}
+  .chat-ask button{border:none;background:var(--ink);color:var(--paper);border-radius:9px;width:40px;font-size:16px;cursor:pointer;transition:background .15s ease}
+  .chat-ask button:hover{background:var(--accent)}
+  #chatBody{max-height:300px;overflow-y:auto}
 
   /* ---------- proof strip ---------- */
   .proof{border-bottom:1px solid var(--line);background:var(--paper)}
@@ -295,6 +301,10 @@
         <div class="live"><span class="dot" style="background:var(--green)"></span>live demo</div>
       </div>
       <div class="chat-body" id="chatBody"></div>
+      <form class="chat-ask" id="chatForm" autocomplete="off">
+        <input id="chatQ" type="text" placeholder="Ask about shipping, returns, sizing..." aria-label="Ask the support bot a question" />
+        <button type="submit" aria-label="Send">&rarr;</button>
+      </form>
     </div>
   </div>
 </header>
@@ -494,51 +504,56 @@
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  // Animated hero chat — types out a short, believable exchange, then loops.
+  // Live hero chat — real bot backed by a Cloudflare Worker (Workers AI).
   (function(){
-    var body = document.getElementById('chatBody');
-    if(!body) return;
-    var script = [
-      {who:'user', text:'How long does shipping take?'},
-      {who:'bot',  text:'Standard shipping is 3&ndash;5 business days within the US. Express (1&ndash;2 days) is available at checkout.', cite:'source: shipping-policy.md'},
-      {who:'user', text:'Can I change my address after ordering?'},
-      {who:'bot',  text:'Yes, if the order hasn&rsquo;t shipped. Share your order number and I&rsquo;ll flag it for the team.', cite:'source: orders-faq.md'}
-    ];
-    var i = 0;
-    function clear(){ body.innerHTML=''; }
-    function addTyping(){
-      var t = document.createElement('div');
-      t.className='typing';
-      t.innerHTML='<span></span><span></span><span></span>';
-      body.appendChild(t);
-      return t;
-    }
-    function addBubble(msg){
-      var b = document.createElement('div');
-      b.className='bubble '+msg.who;
-      b.innerHTML = msg.text + (msg.cite ? '<span class="cite">'+msg.cite+'</span>' : '');
-      body.appendChild(b);
-    }
-    function step(){
-      var msg = script[i];
-      if(msg.who==='bot'){
-        var t = addTyping();
-        setTimeout(function(){ t.remove(); addBubble(msg); next(); }, 750);
-      } else {
-        addBubble(msg);
-        next();
+    var WORKER_URL = "https://silent-mountain-76bd.sullys1981.workers.dev";
+    var body  = document.getElementById('chatBody');
+    var form  = document.getElementById('chatForm');
+    var input = document.getElementById('chatQ');
+    if(!body || !form) return;
+
+    function bubble(text, who, cite){
+      var d = document.createElement('div');
+      d.className = 'bubble ' + who;
+      d.textContent = text;
+      if(cite){
+        var s = document.createElement('span');
+        s.className = 'cite';
+        s.textContent = 'source: ' + cite;
+        d.appendChild(s);
       }
+      body.appendChild(d);
+      body.scrollTop = body.scrollHeight;
     }
-    function next(){
-      i++;
-      if(i < script.length){
-        setTimeout(step, msg_delay());
-      } else {
-        setTimeout(function(){ clear(); i=0; step(); }, 3600);
-      }
-    }
-    function msg_delay(){ return script[i] && script[i].who==='user' ? 900 : 500; }
-    step();
+
+    bubble("Hi! I'm a live demo support bot — ask me about shipping, returns, sizing, or warranty.", 'bot');
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var q = input.value.trim();
+      if(!q) return;
+      input.value = '';
+      bubble(q, 'user');
+      var typing = document.createElement('div');
+      typing.className = 'typing';
+      typing.innerHTML = '<span></span><span></span><span></span>';
+      body.appendChild(typing);
+      body.scrollTop = body.scrollHeight;
+      fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        typing.remove();
+        bubble(data.answer || data.error || "Hmm, something went wrong.", 'bot', data.source);
+      })
+      .catch(function(){
+        typing.remove();
+        bubble("Sorry, I couldn't reach the assistant just now — please try again.", 'bot');
+      });
+    });
   })();
 
   // In-page nav: smooth scroll with sticky-header offset + active-tab highlighting.
