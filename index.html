@@ -413,22 +413,37 @@
         </div>
       </div>
       <div class="feature-visual">
-        <div class="chat" style="width:100%;max-width:360px;box-shadow:0 1px 0 var(--line),0 22px 44px -30px rgba(40,30,15,.55)">
-          <div class="chat-top">
-            <div class="avatar">AI</div>
-            <div>
-              <div class="who">Acme Store Helper</div>
-              <div class="src">knowledge_base/ &middot; 14 docs</div>
-            </div>
-          </div>
-          <div class="chat-body" style="min-height:200px">
-            <div class="bubble user" style="animation-delay:.1s">Do you ship to Canada?</div>
-            <div class="bubble bot" style="animation-delay:.5s">Yes &mdash; standard shipping to Canada is 5&ndash;8 business days, calculated at checkout.<span class="cite">source: shipping-policy.md</span></div>
-            <div class="bubble user" style="animation-delay:1s">What&rsquo;s your return window?</div>
-            <div class="bubble bot" style="animation-delay:1.4s">30 days from delivery for unused items. I can start a return if you share your order number.<span class="cite">source: returns.md</span></div>
-          </div>
+        <div class="avatar-demo" id="avatarDemo2" style="width:100%;max-width:360px">
+          <button type="button" id="avatarPoster2" class="av-poster" aria-label="Load the live AI assistant demo"
+            style="position:relative;display:block;width:100%;height:480px;border:1px solid var(--line-2);border-radius:14px;overflow:hidden;cursor:pointer;padding:0;
+                   background:radial-gradient(120% 90% at 50% 18%, #1b3050 0%, #0e1726 60%, #0a111d 100%);
+                   box-shadow:0 1px 0 var(--line),0 22px 44px -30px rgba(40,30,15,.55);transition:transform .15s ease">
+            <span style="position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:#7fe0a3">
+              <span style="width:8px;height:8px;border-radius:50%;background:#27c768;box-shadow:0 0 10px #27c768"></span>LIVE DEMO
+            </span>
+            <span style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:22px">
+              <span class="av-play" style="width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.96);display:flex;align-items:center;justify-content:center;box-shadow:0 14px 40px -12px rgba(0,0,0,.6);transition:transform .15s ease">
+                <span style="margin-left:5px;border-style:solid;border-width:12px 0 12px 19px;border-color:transparent transparent transparent #12305a"></span>
+              </span>
+              <span style="font-family:var(--font-display);font-size:23px;color:#fff;line-height:1.15">Meet your AI assistant</span>
+              <span style="font-family:var(--font-mono);font-size:12px;color:#9fb2c8;max-width:22em;line-height:1.5">Talking &middot; answers only from approved content &middot; cites its sources</span>
+              <span style="font-size:12px;color:#6f829a">Tap to load the live demo</span>
+            </span>
+          </button>
         </div>
       </div>
+      <script>
+        (function(){
+          var b=document.getElementById('avatarPoster2'); if(!b) return;
+          b.addEventListener('click', function(){
+            var f=document.createElement('iframe');
+            f.src='demo/'; f.title='AI Assistant — live talking demo by Jason W. Sullivan';
+            f.setAttribute('allow','autoplay');
+            f.style.cssText='display:block;width:100%;height:480px;border:1px solid var(--line-2);border-radius:14px;box-shadow:0 1px 0 var(--line),0 22px 44px -30px rgba(40,30,15,.55);background:#0e1726';
+            var w=document.getElementById('avatarDemo2'); w.innerHTML=''; w.appendChild(f);
+          });
+        })();
+      </script>
     </div>
   </div>
 </section>
